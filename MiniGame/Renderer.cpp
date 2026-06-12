@@ -82,6 +82,10 @@ void Renderer::ScreenPrint(int X, int Y, const std::string& Text, ConsoleColor C
 {
     DWORD dw;
     COORD Pos = { (SHORT)X, (SHORT)Y };
+    if (IsShaking)
+    {
+        Pos = { static_cast<SHORT>(X + ShakeOffsetX), static_cast<SHORT>(Y + ShakeOffsetY) };
+    }
 
     WriteConsoleOutputCharacterA(
         g_hScreen[g_nScreenIndex],
@@ -345,6 +349,26 @@ ConsoleColor Renderer::SetTimeTextColor()
     else
     {
         return ConsoleColor::RED;
+    }
+}
+
+void Renderer::StartScreenShake()
+{
+    IsShaking = true;
+}
+
+void Renderer::StopScreenShake()
+{
+    IsShaking = false;
+    int y = GameManager::FullHeight;
+    int x = GameManager::FullWidth;
+    for (int i = 0; i <= y; i++)
+    {
+        ScreenPrint(x, i, &GameManager::Blank, NormalColor);
+    }
+    for (int j = 0; j <= x; j++)
+    {
+        ScreenPrint(j, y, &GameManager::Blank, NormalColor);
     }
 }
 

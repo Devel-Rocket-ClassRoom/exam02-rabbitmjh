@@ -49,6 +49,7 @@ void GameManager::Update()
 
         if (dir != Player::Dir::Idle)
         {
+            renderer.StartScreenShake();
             timerManager.StartTimer();
 
             renderer.ClearPlayerPosition(player.GetPlayerY(), player.GetPlayerX());
@@ -71,6 +72,10 @@ void GameManager::Update()
 
             if (gameState.Count % LevelCount == 0)
                 scoreManager.IncreaseLevel();
+        }
+        else
+        {
+            renderer.StopScreenShake();
         }
         renderer.ScreenFlipping();
     }

@@ -49,7 +49,7 @@ private:
     
     int ShakeOffsetX = 1;
     int ShakeOffsetY = 1;
-    int ShakeFrameCount = 0;
+    bool IsShaking = false;
 
 	// 카운트 다운 애니메이션
     const std::vector<std::vector<std::string>> CountDownNum =
@@ -245,4 +245,6 @@ public:
     void ClearPlayerPosition(int y, int x); // 버퍼에 플레이어가 있던 자리 공백으로
     void SaveScoreBoard();  // ScoreBoard 벡터에 스코어보드 저장
     ConsoleColor SetTimeTextColor();    // 시간 숫자 텍스트 색깔 지정
+    void StartScreenShake();
+    void StopScreenShake();
 };
