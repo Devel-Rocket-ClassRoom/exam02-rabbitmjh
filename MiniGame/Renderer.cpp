@@ -6,7 +6,7 @@
 #include <iostream>
 #include <format>
 
-void Renderer::SetTerminalSizeVT(int width, int height)
+void Renderer::SetTerminalSizeVT(int width, int height) const
 {
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hOut == INVALID_HANDLE_VALUE) return;
@@ -44,7 +44,7 @@ void Renderer::ScreenInit(GameMap* gM, GameState* gS, MapGenerator* mG, Player* 
     SetConsoleCursorInfo(g_hScreen[1], &cci);
 }
 
-void Renderer::ScreenClear()
+void Renderer::ScreenClear() const
 {
     COORD Coor = { 0, 0 };
     DWORD dw;
@@ -78,7 +78,7 @@ void Renderer::ScreenRelease()
     }
 }
 
-void Renderer::ScreenPrint(int X, int Y, const std::string& Text, ConsoleColor Color)
+void Renderer::ScreenPrint(int X, int Y, const std::string& Text, ConsoleColor Color) const
 {
     DWORD dw;
     COORD Pos = { (SHORT)X, (SHORT)Y };
@@ -236,7 +236,7 @@ void Renderer::SaveMapToBuffer()
     }
 }
 
-void Renderer::SaveBorderToBuffer()
+void Renderer::SaveBorderToBuffer() const
 {
     int WidthPlusOne = GameManager::Width + 1;
 
@@ -266,10 +266,6 @@ void Renderer::SaveBorderToBuffer()
 void Renderer::SaveScoreBoardToBuffer(int x, int y, ConsoleColor Color)
 {
     std::string tmp(1, ScoreBoard[GameManager::Height - y - 1][x - GameManager::Width - 2]);
-    for (int i = x; i < GameManager::FullWidth - 1; i++)
-    {
-
-    }
     ScreenPrint(x, y + 1, tmp, Color);
 }
 
@@ -335,7 +331,7 @@ void Renderer::SaveScoreBoard()
     ScoreBoard.push_back(StringTime);
 }
 
-ConsoleColor Renderer::SetTimeTextColor()
+ConsoleColor Renderer::SetTimeTextColor() const
 {
     float TimeRatio = gameState->CurrentTime / gameState->LevelTime;
     if (TimeRatio > 0.5f)

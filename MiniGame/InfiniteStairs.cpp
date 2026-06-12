@@ -1,9 +1,4 @@
-﻿#include <iostream>
-#include <windows.h> // 콘솔 화면 초기화
-#include <conio.h> // 방향키 입력
-#include <format>
-#include <random>
-#include <algorithm>
+﻿#include "InfiniteStairs.h"
 #include "GameManager.h"
 
 int main() // 무한의계단

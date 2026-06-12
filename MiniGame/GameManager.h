@@ -25,12 +25,9 @@ private:
 	TimerManager timerManager;
 
 public:
-	GameManager()
-	{
-	}
-	~GameManager()
-	{
-	}
+	GameManager() = default;
+	~GameManager() = default;
+
 	static const int LeftInput = 75;
 	static const int RightInput = 77;
 	static const char Blank = ' ';

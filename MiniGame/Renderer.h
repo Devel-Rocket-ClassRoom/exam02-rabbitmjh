@@ -32,7 +32,6 @@ class Player;
 class Renderer
 {
 private:
-    ConsoleColor NowColor = ConsoleColor::WHITE;                // 현재 색깔
     const ConsoleColor BorderColor = ConsoleColor::DARKGRAY;    // 테두리 색깔
     const ConsoleColor PlayerColor = ConsoleColor::YELLOW;  // 플레이어 색깔
     const ConsoleColor NormalColor = ConsoleColor::WHITE;       // 기본 색깔
@@ -47,8 +46,8 @@ private:
     MapGenerator* mapGenerator;
     Player* player;
     
-    int ShakeOffsetX = 1;
-    int ShakeOffsetY = 1;
+    const int ShakeOffsetX = 1;
+    const int ShakeOffsetY = 1;
     bool IsShaking = false;
 
 	// 카운트 다운 애니메이션
@@ -226,25 +225,24 @@ private:
         }
     };
 
-public:
     std::vector<std::string> ScoreBoard;    // 스코어보드 저장
-
-    void SetTerminalSizeVT(int width, int height); // 콘솔 창 크기 조절 함수
+public:
+    void SetTerminalSizeVT(int width, int height) const; // 콘솔 창 크기 조절 함수
 	void ScreenInit(GameMap* gM, GameState* gS, MapGenerator* mG, Player* pl);      // 더블 버퍼링 버퍼 생성
-	void ScreenClear();     // 더블 버퍼링 화면 초기화
+	void ScreenClear() const;     // 더블 버퍼링 화면 초기화
 	void ScreenFlipping();  // 더블 버퍼링 화면 전환
 	void ScreenRelease();   // 더블 버퍼링 버퍼 해제
-	void ScreenPrint(int X, int Y, const std::string& Text, ConsoleColor Color);   // 더블 버퍼링 출력값 버퍼에 저장
+	void ScreenPrint(int X, int Y, const std::string& Text, ConsoleColor Color) const;   // 더블 버퍼링 출력값 버퍼에 저장
 	void PrintTitle();      // 타이틀 출력
 	void PrintCountdown();	// 카운트다운 출력
 	void PrintGameOver(const int Level, const int Score);   // 게임오버 출력
     void SaveMapToBuffer();       // 버퍼에 게임 화면 저장
-    void SaveBorderToBuffer();      // 버퍼에 맨위, 맨아래줄 그리기
+    void SaveBorderToBuffer() const;      // 버퍼에 맨위, 맨아래줄 그리기
     void SaveScoreBoardToBuffer(int y, int x, ConsoleColor Color);  // 버퍼에 스코어보드 그리기
     void SavePlayerToBuffer();      // 버퍼에 플레이어 그리기
     void ClearPlayerPosition(int y, int x); // 버퍼에 플레이어가 있던 자리 공백으로
     void SaveScoreBoard();  // ScoreBoard 벡터에 스코어보드 저장
-    ConsoleColor SetTimeTextColor();    // 시간 숫자 텍스트 색깔 지정
-    void StartScreenShake();
-    void StopScreenShake();
+    ConsoleColor SetTimeTextColor() const;    // 시간 비율로 숫자 텍스트 색깔 지정
+    void StartScreenShake();        // 화면 흔들림 시작
+    void StopScreenShake();         // 화면 흔들림 해제, 범위 밖으로 벗어난 것들 빈칸으로
 };
