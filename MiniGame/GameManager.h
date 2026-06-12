@@ -48,7 +48,8 @@ public:
 
 	static const int LevelCount = 10;	// 레벨이 올라가는데 필요한 계단수
 	inline static const float MinLevelTime = 0.5f;  // 최소한의 정지허용시간
-	inline static const float LevelMinusTime = 0.3f;// 레벨마다 줄어드는 정지허용시간
+	inline static const float LevelMinusTime = 0.5f;// 레벨마다 줄어드는 정지허용시간
+	inline static const float FirstLevelTime = 5.f;   // 최초 레벨 정지허용시간
 
 	void Init();
 	void Run();

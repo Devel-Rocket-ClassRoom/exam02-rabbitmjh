@@ -78,7 +78,7 @@ void Renderer::ScreenRelease()
     }
 }
 
-void Renderer::ScreenPrint(int X, int Y, const std::string& Text)
+void Renderer::ScreenPrint(int X, int Y, const std::string& Text, ConsoleColor Color)
 {
     DWORD dw;
     COORD Pos = { (SHORT)X, (SHORT)Y };
@@ -87,6 +87,17 @@ void Renderer::ScreenPrint(int X, int Y, const std::string& Text)
         g_hScreen[g_nScreenIndex],
         Text.c_str(),
         (DWORD)Text.length(),
+        Pos,
+        &dw
+    );
+
+    std::vector<WORD> Attributes(Text.length(), static_cast<WORD>(Color));
+
+    WriteConsoleOutputAttribute
+    (
+        g_hScreen[g_nScreenIndex],
+        Attributes.data(),
+        (DWORD)Attributes.size(),
         Pos,
         &dw
     );
@@ -101,7 +112,7 @@ void Renderer::PrintTitle()
             ScreenClear();
 
             for (int j = 0; j < TitleAnimationFrames[i].size(); j++)
-                ScreenPrint(0, j, TitleAnimationFrames[i][j]);
+                ScreenPrint(0, j, TitleAnimationFrames[i][j], NormalColor);
             Sleep(500);
             ScreenFlipping();
         }
@@ -119,7 +130,7 @@ void Renderer::PrintCountdown()
         ScreenClear();
 
         for (int j = 0; j < CountDownNum[i].size(); j++)
-            ScreenPrint(0, j, CountDownNum[i][j]);
+            ScreenPrint(0, j, CountDownNum[i][j], NormalColor);
         Sleep(1000);
         ScreenFlipping();
     }
@@ -140,11 +151,11 @@ void Renderer::PrintGameOver(const int Level, const int Score)
             for (int j = 0; j < GameOverScreen[i].size(); j++)
             {
                 if (j == 15)
-                    ScreenPrint(0, j, StringScore);
+                    ScreenPrint(0, j, StringScore, NormalColor);
                 else if (j == 17)
-                    ScreenPrint(0, j, StringLevel);
+                    ScreenPrint(0, j, StringLevel, NormalColor);
                 else
-                    ScreenPrint(0, j, GameOverScreen[i][j]);
+                    ScreenPrint(0, j, GameOverScreen[i][j], NormalColor);
             }
             Sleep(500);
             ScreenFlipping();
@@ -168,38 +179,54 @@ void Renderer::SaveMapToBuffer()
     for (int i = 0; i < GameManager::Height; i++)
     {
         bool IsEdge = false;
+        int TimeTextCheck = 0;
+
         for (int j = 0; j < GameManager::FullWidth; j++)
         {
             IsEdge = (j == 0 || j == WidthPlusOne || j == FullWidthMinusOne) ? true : false;
-
             if (IsEdge) // 테두리
             {
-                ScreenPrint(j, i + 1, "║");
+                ScreenPrint(j, i + 1, "║", BorderColor);
             }
             else if (j <= GameManager::Width)
             {
                 // 인게임
                 char Tile = gameMap->GetGameMap()[GameManager::Height - i - 1][j];
+                std::string tmp(1, Tile);
+
                 if (Tile == GameManager::ABlock[0])
                 {
                     // 계단
-                    ScreenPrint(j, i + 1, GameManager::Block);
+                    ScreenPrint(j, i + 1, GameManager::Block, NormalStair);
                     j += 2;
+                }
+                else if (Tile == 'O' || Tile == '|' || Tile == '\\' || Tile == '/' || Tile == '>' || Tile == '<')
+                {
+                    // 플레이어
+                    ScreenPrint(j, i + 1, tmp, PlayerColor);
                 }
                 else
                 {
-                    std::string tmp(1, Tile);
-                    ScreenPrint(j, i + 1, tmp);
+                    // 공백
+                    ScreenPrint(j, i + 1, tmp, NormalColor);
                 }
             }
             else if (j > GameManager::Width)
             {
                 // 스코어보드
-                SaveScoreBoardToBuffer(j, i);
+                if (i == 0 && 5 < TimeTextCheck && TimeTextCheck < 10)    // 시간 숫자 텍스트 
+                {
+                    SaveScoreBoardToBuffer(j, i, SetTimeTextColor());
+                }
+                else
+                {
+                    SaveScoreBoardToBuffer(j, i, NormalColor);
+                }
+                TimeTextCheck++;
             }
             else
             {
-                ScreenPrint(j, i + 1, &GameManager::Blank);
+                ScreenPrint(j, i + 1, &GameManager::Blank, NormalColor);
             }
         }
     }
@@ -211,31 +238,35 @@ void Renderer::SaveBorderToBuffer()
 
     std::string Header;
     Header += "╔";
-    ScreenPrint(0, 0, "╔");
+    ScreenPrint(0, 0, "╔", BorderColor);
     for (int i = 1; i < GameManager::FullWidth - 1; i++)
     {
-        ScreenPrint(i, 0, (i != WidthPlusOne ? "═" : "╦"));
+        ScreenPrint(i, 0, (i != WidthPlusOne ? "═" : "╦"), BorderColor);
         Header += (i != WidthPlusOne ? "═" : "╦");
     }
-    ScreenPrint(GameManager::FullWidth - 1, 0, "╗");
+    ScreenPrint(GameManager::FullWidth - 1, 0, "╗", BorderColor);
     Header += "╗";
 
     std::string Footer;
     Footer += "╚";
-    ScreenPrint(0, GameManager::FullHeight - 1, "╚");
+    ScreenPrint(0, GameManager::FullHeight - 1, "╚", BorderColor);
     for (int i = 1; i < GameManager::FullWidth - 1; i++)
     {
-        ScreenPrint(i, GameManager::FullHeight - 1, (i != WidthPlusOne ? "═" : "╩"));
+        ScreenPrint(i, GameManager::FullHeight - 1, (i != WidthPlusOne ? "═" : "╩"), BorderColor);
         Footer += (i != WidthPlusOne ? "═" : "╩");
     }
-    ScreenPrint(GameManager::FullWidth - 1, GameManager::FullHeight - 1, "╝");
+    ScreenPrint(GameManager::FullWidth - 1, GameManager::FullHeight - 1, "╝", BorderColor);
     Footer += "╝";
 }
 
-void Renderer::SaveScoreBoardToBuffer(int x, int y)
+void Renderer::SaveScoreBoardToBuffer(int x, int y, ConsoleColor Color)
 {
     std::string tmp(1, ScoreBoard[GameManager::Height - y - 1][x - GameManager::Width - 2]);
-    ScreenPrint(x, y + 1, tmp);
+    for (int i = x; i < GameManager::FullWidth - 1; i++)
+    {
+
+    }
+    ScreenPrint(x, y + 1, tmp, Color);
 }
 
 void Renderer::SavePlayerToBuffer()
@@ -298,5 +329,22 @@ void Renderer::SaveScoreBoard()
     while (StringTime.size() < GameManager::ScoreBoardWidth + 2)
         StringTime += GameManager::Blank;
     ScoreBoard.push_back(StringTime);
+}
+
+ConsoleColor Renderer::SetTimeTextColor()
+{
+    float TimeRatio = gameState->CurrentTime / gameState->LevelTime;
+    if (TimeRatio > 0.5f)
+    {
+        return ConsoleColor::GREEN;
+    }
+    else if (TimeRatio > 0.3f)
+    {
+        return ConsoleColor::YELLOW;
+    }
+    else
+    {
+        return ConsoleColor::RED;
+    }
 }
 

@@ -21,6 +21,6 @@ void ScoreManager::UpdateLevelTime()
 {
 	gameState->LevelTime = std::max<float>(
 		GameManager::MinLevelTime,
-		5.f- static_cast<float>(gameState->Level - 1) * GameManager::LevelMinusTime
+		GameManager::FirstLevelTime - static_cast<float>(gameState->Level - 1) * GameManager::LevelMinusTime
 	);
 }
