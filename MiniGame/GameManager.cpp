@@ -71,7 +71,10 @@ void GameManager::Update()
             scoreManager.AddScore();
 
             if (gameState.Count % LevelCount == 0)
+            {
                 scoreManager.IncreaseLevel();
+                renderer.StartLevelUpEffect();
+            }
         }
         else
         {

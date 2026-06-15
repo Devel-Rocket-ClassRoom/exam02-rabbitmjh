@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <random>
 #include "GameMap.h"
 
@@ -10,6 +10,7 @@ class MapGenerator
 {
 private:
 	const int FirstStairX = 11;          // 최초 계단의 X값
+	int StairCount = 1;
 
 	GameState* gameState;
 	Renderer* renderer;

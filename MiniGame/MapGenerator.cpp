@@ -1,4 +1,4 @@
-#include "MapGenerator.h"
+﻿#include "MapGenerator.h"
 #include "GameManager.h"
 #include <random>
 
@@ -28,13 +28,15 @@ void MapGenerator::CreateFirstMap()
                 CurrentFloor += GameManager::Blank;
 
             PlaceNextStairs();
+            gameMap->PushBackGameMap(CurrentFloor, StairCount);
+            StairCount++;
         }
         else
         {
             for (int i = 0; i < GameManager::Width; i++)
                 CurrentFloor += GameManager::Blank;
+            gameMap->PushBackGameMap(CurrentFloor, 0);
         }
-        gameMap->PushBackGameMap(CurrentFloor);
     }
     renderer->SavePlayerToBuffer();
 }
@@ -58,13 +60,15 @@ void MapGenerator::UpdateMap()
                 for (int j = StairEnd; j < GameManager::Width; j++)
                     CurrentFloor += GameManager::Blank;
                 PlaceNextStairs();
+                gameMap->PushBackGameMap(CurrentFloor, StairCount);
+                StairCount++;
             }
             else
             {
                 for (int j = 0; j < GameManager::Width; j++)
                     CurrentFloor += GameManager::Blank;
+                gameMap->PushBackGameMap(CurrentFloor, 0);
             }
-            gameMap->PushBackGameMap(CurrentFloor);
         }
     }
 }

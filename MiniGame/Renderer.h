@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <windows.h>
 #include <string>
 #include <vector>
@@ -32,10 +32,11 @@ class Player;
 class Renderer
 {
 private:
-    const ConsoleColor BorderColor = ConsoleColor::DARKGRAY;    // 테두리 색깔
+    ConsoleColor BorderColor = ConsoleColor::DARKGRAY;    // 테두리 색깔
     const ConsoleColor PlayerColor = ConsoleColor::YELLOW;  // 플레이어 색깔
     const ConsoleColor NormalColor = ConsoleColor::WHITE;       // 기본 색깔
     const ConsoleColor NormalStair = ConsoleColor::LIGHTGRAY;   // 기본 계단 색깔
+    const ConsoleColor LevelUpColor = ConsoleColor::RED;   // 레벨업 계단 색깔
 
 	int g_nScreenIndex = 0;
     HANDLE g_hScreen[2] = { nullptr, nullptr };
@@ -49,6 +50,12 @@ private:
     const int ShakeOffsetX = 1;
     const int ShakeOffsetY = 1;
     bool IsShaking = false;
+
+    bool IsLevelUpEffect = false;
+    int LevelUpEffectFrame = 0;
+    const int LevelUpEffectBlinkPeriod = 4;
+    const int LevelUpEffectMaxFrame = 12;
+    const std::string LevelUpString = "   LEVEL UP!";
 
 	// 카운트 다운 애니메이션
     const std::vector<std::vector<std::string>> CountDownNum =
@@ -245,4 +252,7 @@ public:
     ConsoleColor SetTimeTextColor() const;    // 시간 비율로 숫자 텍스트 색깔 지정
     void StartScreenShake();        // 화면 흔들림 시작
     void StopScreenShake();         // 화면 흔들림 해제, 범위 밖으로 벗어난 것들 빈칸으로
+    bool IsLevelUpStair(int n);     // 레벨업 계단인지 확인
+    void StartLevelUpEffect();      // 레벨업 이펙트
+    void UpdateLevelUpEffect();     // 레벨업 이펙트 깜빡이게
 };

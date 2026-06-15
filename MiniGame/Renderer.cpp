@@ -1,4 +1,4 @@
-#include "Renderer.h"
+﻿#include "Renderer.h"
 #include "GameManager.h"
 #include <string>
 #include <vector>
@@ -177,6 +177,7 @@ void Renderer::SaveMapToBuffer()
     int FullWidthMinusOne = GameManager::FullWidth - 1;
     int WidthPlusOne = GameManager::Width + 1;
 
+    UpdateLevelUpEffect();
     SaveScoreBoard();
     SaveBorderToBuffer();
 
@@ -195,13 +196,22 @@ void Renderer::SaveMapToBuffer()
             else if (j <= GameManager::Width)
             {
                 // 인게임
-                char Tile = gameMap->GetGameMap()[GameManager::Height - i - 1][j];
+                char Tile = gameMap->GetGameMap()[GameManager::Height - i - 1].first[j];
                 std::string tmp(1, Tile);
 
                 if (Tile == GameManager::ABlock[0])
                 {
                     // 계단
-                    ScreenPrint(j, i + 1, GameManager::Block, NormalStair);
+                    if (IsLevelUpStair(gameMap->GetGameMap()[GameManager::Height - i - 1].second))
+                    {
+                        // 레벨업 계단
+                        ScreenPrint(j, i + 1, GameManager::Block, LevelUpColor);
+                    }
+                    else
+                    {
+                        // 일반 계단
+                        ScreenPrint(j, i + 1, GameManager::Block, NormalStair);
+                    }
                     j += 2;
                 }
                 else if (Tile == 'O' || Tile == '|' || Tile == '\\' || Tile == '/' || Tile == '>' || Tile == '<')
@@ -318,10 +328,15 @@ void Renderer::SaveScoreBoard()
     int tmp = GameManager::Height - 3;
     for (int i = 0; i < tmp; i++)
     {
-        std::string s;
-        for (int j = 0; j < GameManager::ScoreBoardWidth; j++)
+        std::string s = "";
+        if (i == tmp / 2 && IsLevelUpEffect && LevelUpEffectFrame % LevelUpEffectBlinkPeriod == 0)
+        {
+            s = LevelUpString;
+        }
+        for (int j = s.size(); j < GameManager::ScoreBoardWidth; j++)
+        {
             s += GameManager::Blank;
-
+        }
         ScoreBoard.push_back(s);
     }
 
@@ -334,7 +349,7 @@ void Renderer::SaveScoreBoard()
 ConsoleColor Renderer::SetTimeTextColor() const
 {
     float TimeRatio = gameState->CurrentTime / gameState->LevelTime;
-    if (TimeRatio > 0.5f)
+    if (TimeRatio > 0.6f)
     {
         return ConsoleColor::GREEN;
     }
@@ -365,6 +380,31 @@ void Renderer::StopScreenShake()
     for (int j = 0; j <= x; j++)
     {
         ScreenPrint(j, y, &GameManager::Blank, NormalColor);
+    }
+}
+
+bool Renderer::IsLevelUpStair(int n)
+{
+    return (n % GameManager::LevelCount) == 0;
+}
+
+void Renderer::StartLevelUpEffect()
+{
+    IsLevelUpEffect = true;
+    LevelUpEffectFrame = 0;
+}
+
+void Renderer::UpdateLevelUpEffect()
+{
+    if (!IsLevelUpEffect)
+        return;
+
+    LevelUpEffectFrame++;
+
+    if (LevelUpEffectFrame >= LevelUpEffectMaxFrame)
+    {
+        IsLevelUpEffect = false;
+        LevelUpEffectFrame = 0;
     }
 }
 
